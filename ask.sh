@@ -19,7 +19,7 @@ Options:
 
 Exit status:
 	1: positive answer
-	2: negative answer
+	0: negative answer
 "
 }
 
@@ -48,7 +48,7 @@ done
 [[ "$a" == "" ]] && a="$2"
 
 if [ "$a" == "Y" ]; then
-  exit 0 
+  exit 1 
 else
-  exit 1
+  exit 0
 fi
