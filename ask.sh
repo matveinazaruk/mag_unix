@@ -18,8 +18,8 @@ Options:
   -h, --help          shows this help
 
 Exit status:
-  1: positive answer
-  0: negative answer
+  0: positive answer
+  1: negative answer
 "
 }
 
@@ -35,7 +35,7 @@ if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
 fi
 
 # Check default value
-if [ "$2" != "Y" ] && [ "$2" != "--help" ]; then 
+if [ -n "$2" ] && [ "$2" != "Y" ] && [ "$2" != "--help" ]; then 
   show_help
   exit
 fi
