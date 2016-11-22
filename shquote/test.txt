@@ -1,0 +1,7 @@
+echo
+pen
+pineapple
+apple
+pen
+let's dance
+"lalala"
