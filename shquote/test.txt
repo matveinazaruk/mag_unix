@@ -1,7 +1,5 @@
 echo
 pen
-pineapple
-apple
-pen
 let's dance
+\"opop\"
 "lalala"
