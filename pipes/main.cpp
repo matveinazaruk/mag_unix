@@ -17,7 +17,17 @@ char ** toProcessArgs(std::vector<std::string> &args) {
     return processArgs;
 }
 
+void printUsage() {
+    std::cout << "\nUsage: pipeline command1 | command2 | ... | commandN\n";
+}
+
 int main(int argc, char ** argv) {
+    
+    if (argc < 2) {
+        std::cerr << "ARGUMENTS ERROR: Argument list can't be empty." << std::endl;
+        printUsage();
+        return 2;
+    }
 
     int childrenCount = 1;
 
@@ -27,6 +37,7 @@ int main(int argc, char ** argv) {
         if (strcmp(argv[i], "|") == 0) {
             if (args[childrenCount - 1].size() == 0) {
                 std::cerr << "ARGUMENTS ERROR: There sould be at least 1 command beetween pipes" << std::endl;
+                printUsage();
                 return 2;
             }
             childrenCount++;
@@ -35,6 +46,12 @@ int main(int argc, char ** argv) {
             std::string arg (argv[i]);
             args[childrenCount - 1].push_back(arg);
         }
+    }
+
+    if (args[childrenCount - 1].size() < 1) {
+        std::cerr << "ARGUMENTS ERROR: There sould be at least 1 command after last pipe" << std::endl;
+        printUsage();
+        return 2;
     }
 
     int pipefds[childrenCount - 1][2];
@@ -110,7 +127,7 @@ int main(int argc, char ** argv) {
     for (int i = 0; i < childrenCount - 1; ++i) {
         close(pipefds[i][0]);
     }
-    delete children;
+    delete[] children;
 
     return exitCode;
 }
