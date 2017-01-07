@@ -127,18 +127,12 @@ int main(int argc, char ** argv) {
     int status;
     for (int i = 0; i < childrenCount; ++i) {
         if (children[i] != -1) {
-            std::cerr << "Waiting for process: " << children[i] << std::endl;
-
             waitpid(children[i], &status, 0);
         }
         if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) != 0) {
                 exitCode = 1;
-            } else {
-                std::cerr << "Process ended: " << children[i] << std::endl;
             }
-        } else {
-            std::cerr << "Process not ended: " << children[i] << std::endl;
         }
     }
 
