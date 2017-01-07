@@ -65,9 +65,9 @@ int main(int argc, char ** argv) {
             perror("Pipe creating error");
             return 1;
         }
-        if (fcntl(pipefds[i][1], F_SETPIPE_SZ, 100000000) == -1) {
-            perror("Pipe fcntl error");
-        }
+        // if (fcntl(pipefds[i][1], F_SETPIPE_SZ, 100000000) == -1) {
+            // perror("Pipe fcntl error");
+        // }
     }
 
     pid_t * children = new pid_t [childrenCount];
@@ -93,6 +93,7 @@ int main(int argc, char ** argv) {
                 }
             }
 
+
             for (int j = i + 1; j < childrenCount - 1; ++j) {
                 if (close(pipefds[j][0]) == -1) {
                     perror("Close pipe file descriptor for reading error.");
@@ -117,6 +118,10 @@ int main(int argc, char ** argv) {
         if (i != 0) {
             if (close(pipefds[i - 1][1]) == -1) {
                 perror("Close pipe file descriptor for writing error.");
+            }
+
+            if (close(pipefds[i - 1][0]) == -1) {
+                perror("Close pipe file descriptor for reading error.");
             }
         }
 
