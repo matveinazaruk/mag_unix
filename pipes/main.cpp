@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/wait.h>
 #include <cstring>
@@ -54,11 +55,18 @@ int main(int argc, char ** argv) {
         return 2;
     }
 
-    int pipefds[childrenCount - 1][2];
+    auto pipefds = new int * [childrenCount - 1];
+    for (int i = 0; i < childrenCount - 1; i++) {
+        pipefds[i] = new int [2];
+    }
+
     for (int i = 0; i < childrenCount - 1; ++i) {
         if (pipe(pipefds[i]) == -1) {
             perror("Pipe creating error");
             return 1;
+        }
+        if (fcntl(pipefds[i][1], F_SETPIPE_SZ, 100000000) == -1) {
+            perror("Pipe fcntl error");
         }
     }
 
@@ -96,6 +104,8 @@ int main(int argc, char ** argv) {
 
             auto processArgs = toProcessArgs(args[i]);
             if (execvp(args[i][0].c_str(), processArgs) == -1) {
+                children[i] = -1;
+                delete [] processArgs;
                 std::cerr << "Error executing '";
                 std::for_each(args[i].begin(), args[i].end(), [](std::string &arg) { std::cerr << arg << " ";});
                 std::cerr << "'\n";
@@ -116,18 +126,32 @@ int main(int argc, char ** argv) {
     int exitCode = 0;
     int status;
     for (int i = 0; i < childrenCount; ++i) {
-        waitpid(children[i], &status, 0);
+        if (children[i] != -1) {
+            std::cerr << "Waiting for process: " << children[i] << std::endl;
+
+            waitpid(children[i], &status, 0);
+        }
         if (WIFEXITED(status)) {
             if (WEXITSTATUS(status) != 0) {
                 exitCode = 1;
+            } else {
+                std::cerr << "Process ended: " << children[i] << std::endl;
             }
+        } else {
+            std::cerr << "Process not ended: " << children[i] << std::endl;
         }
     }
 
     for (int i = 0; i < childrenCount - 1; ++i) {
         close(pipefds[i][0]);
     }
+
     delete[] children;
+    for (int i = 0; i < childrenCount - 1; i++) {
+        delete pipefds[i];
+    }
+
+    delete[] pipefds;
 
     return exitCode;
 }
