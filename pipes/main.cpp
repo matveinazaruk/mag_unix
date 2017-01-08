@@ -71,6 +71,7 @@ int main(int argc, char ** argv) {
     }
 
     pid_t * children = new pid_t [childrenCount];
+    int exitCode = 0;
 
     for (int i = 0; i < childrenCount; ++i) {
         pid_t pid = fork();
@@ -106,6 +107,7 @@ int main(int argc, char ** argv) {
             auto processArgs = toProcessArgs(args[i]);
             if (execvp(args[i][0].c_str(), processArgs) == -1) {
                 children[i] = -1;
+                exitCode = 1;
                 delete [] processArgs;
                 std::cerr << "Error executing '";
                 std::for_each(args[i].begin(), args[i].end(), [](std::string &arg) { std::cerr << arg << " ";});
@@ -128,7 +130,6 @@ int main(int argc, char ** argv) {
         children[i] = pid;
     }
 
-    int exitCode = 0;
     int status;
     for (int i = 0; i < childrenCount; ++i) {
         if (children[i] != -1) {
