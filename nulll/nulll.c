@@ -30,7 +30,7 @@ static ssize_t nulll_ioctl(struct file *filp, unsigned int cmd, unsigned long ar
 	if (cmd == BLKGETSIZE64) {
 		result = copy_to_user((void *) arg, &used, sizeof(unsigned long));
 	} else {
-		result = ENOIOCTLCMD;
+		result = -ENOIOCTLCMD;
 	}
 
 	return result;
