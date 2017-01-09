@@ -48,7 +48,11 @@ static ssize_t nulll_write(struct file *file, const char __user * in,
 	}
 
 	if (capacity && size > rest) {
-		result = -ENOSPC;
+		if (rest > 0) {
+			result = size - rest;
+		} else {
+			result = -ENOSPC;
+		}
 		rest = 0;
 		goto out_unlock;
 	}
